@@ -45,8 +45,15 @@ jobs:
       - name: Show packages
         run: ls -la nupkgs
 
+      - name: Login to NuGet (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: aligohar215168
+
       - name: Publish packages to NuGet
         run: |
           dotnet nuget push "nupkgs/*.nupkg" \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
