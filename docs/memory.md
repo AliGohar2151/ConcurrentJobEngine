@@ -94,11 +94,11 @@ When conflicts occur:
 # 3. Current Project Status
 
 ```text
-Overall Status: Phase 19 Complete
-Current Phase: Phase 20 — Unit Testing
+Overall Status: Phase 20 Complete
+Current Phase: Phase 21 — Integration Testing
 Phase Status: Not Started
-Current Task: Expand unit test coverage across all boundary conditions and edge cases
-Next Phase: Phase 21 — Integration Testing
+Current Task: Implement end-to-end integration tests for job pipeline
+Next Phase: Phase 22 — Concurrency Testing
 ```
 
 ---
@@ -126,7 +126,7 @@ Next Phase: Phase 21 — Integration Testing
 | 17    | Dependency Injection             | Completed   |
 | 18    | Logging & Observability          | Completed   |
 | 19    | Metrics                          | Completed   |
-| 20    | Unit Testing                     | Not Started |
+| 20    | Unit Testing                     | Completed   |
 | 21    | Integration Testing              | Not Started |
 | 22    | Concurrency Testing              | Not Started |
 | 23    | Benchmarking                     | Not Started |
@@ -140,31 +140,26 @@ Next Phase: Phase 21 — Integration Testing
 
 # 5. Current Phase
 
-## Phase 19 — Metrics
+## Phase 20 — Unit Testing
 
 **Status:** Completed
 
 ### Objective
 
-Add runtime metrics tracking across job execution lifecycle and queue status using `System.Diagnostics.Metrics`.
+Expand unit test coverage across all domain models, custom exceptions, state store active count boundary filtering, and worker pool edge cases.
 
 ### Required Work
 
-- [x] Define `IEngineMetrics` interface in Core abstractions
-- [x] Create `EngineMetrics.cs` using `System.Diagnostics.Metrics.Meter` ("ConcurrentJobEngine") in Diagnostics
-- [x] Create `NullEngineMetrics.cs` no-op implementation
-- [x] Update `PriorityJobScheduler.cs` to inject `IEngineMetrics` and record queue depth (`queue.depth`) and wait time (`job.queue_duration`)
-- [x] Update `JobExecutor.cs` to inject `IEngineMetrics` and record execution metrics (`job.execution_duration`, `jobs.completed`, `jobs.failed`, `jobs.retried`, `jobs.cancelled`, `jobs.timed_out`, `jobs.dead_lettered`)
-- [x] Update `JobProcessor.cs` to inject `IEngineMetrics` and record submission metrics (`jobs.submitted`, `jobs.active`)
-- [x] Register `IEngineMetrics` in `ServiceCollectionExtensions.cs`
-- [x] Create `MetricsTests.cs` using `MeterListener` to verify metrics emission
-- [x] Verify build and tests pass cleanly
+- [x] Create `CoreAndEdgeCasesTests.cs` to test domain models, options, and exceptions
+- [x] Add tests for active count status filtering in `InMemoryJobStateStore`
+- [x] Add tests for `WorkerPool` double start and idle stop
+- [x] Verify build and all unit tests pass cleanly (77 tests passing)
 
 ### Completion Criteria
 
-- [x] All 11 recommended metric instruments are implemented and tested.
-- [x] `MeterListener` captures operational metric measurements.
-- [x] `NullEngineMetrics` provides no-op fallback when metrics are disabled.
+- [x] All domain exceptions, options, and model context properties are tested.
+- [x] `InMemoryJobStateStore` state transition validation and active count filtering are verified.
+- [x] `WorkerPool` double start throws `InvalidOperationException`.
 
 ---
 
@@ -172,7 +167,7 @@ Add runtime metrics tracking across job execution lifecycle and queue status usi
 
 ```text
 Task:
-Expand unit test coverage across all boundary conditions and edge cases (Phase 20).
+Implement end-to-end integration tests for full job pipeline (Phase 21).
 
 Priority:
 High
@@ -188,13 +183,13 @@ Not Started
 The next implementation action is:
 
 ```text
-Comprehensive Unit Testing (Phase 20)
+Integration Testing (Phase 21)
 ```
 
 Tasks to complete:
-1. Audit unit test coverage across Core and Engine components.
-2. Add edge case tests (null parameters, extreme timeouts, high attempt counts, invalid state transitions).
-3. Ensure test suite is fast, deterministic, and isolated.
+1. Expand `ConcurrentJobEngine.IntegrationTests` with end-to-end lifecycle workflows.
+2. Test submission -> scheduling -> execution -> state persistence -> completion via DI container.
+3. Test failure retries and dead-letter routing in full integration setup.
 
 ---
 
@@ -744,14 +739,14 @@ Task description
 An AI assistant joining the project should understand the following:
 
 ```text
-Phase 19 — Metrics has been completed.
+Phase 20 — Unit Testing has been completed.
 
-IEngineMetrics abstraction created in Core abstractions. EngineMetrics implemented in src/ConcurrentJobEngine/Diagnostics/ using System.Diagnostics.Metrics.Meter ("ConcurrentJobEngine"). Metrics recorded across JobProcessor, JobExecutor, PriorityJobScheduler. Verified via 3 unit tests in MetricsTests.cs using MeterListener (69 total tests passing).
+Added CoreAndEdgeCasesTests.cs testing custom exceptions, options defaults, model properties, InMemoryJobStateStore active count filtering across all 7 statuses, and WorkerPool double-start exception handling (77 total tests passing).
 
-The next task is Phase 20:
-Unit Testing.
+The next task is Phase 21:
+Integration Testing.
 
-Focus on expanding unit test coverage across edge cases and boundary conditions.
+Focus on end-to-end integration tests in ConcurrentJobEngine.IntegrationTests.
 ```
 
 ---
@@ -833,13 +828,13 @@ Benchmarking:
 Dedicated Benchmark Project
 
 Current Phase:
-Phase 20 — Unit Testing
+Phase 21 — Integration Testing
 
 Current Status:
-Phase 19 Completed / Phase 20 Not Started
+Phase 20 Completed / Phase 21 Not Started
 
 Immediate Next Step:
-Audit and expand unit test coverage across all boundary conditions
+Implement end-to-end integration tests in IntegrationTests project
 ```
 
 ---
