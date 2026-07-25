@@ -94,11 +94,11 @@ When conflicts occur:
 # 3. Current Project Status
 
 ```text
-Overall Status: Phase 22 Complete
-Current Phase: Phase 23 — Benchmarking
+Overall Status: Phase 23 Complete
+Current Phase: Phase 24 — Performance Optimization
 Phase Status: Not Started
-Current Task: Implement performance micro-benchmarking suite using BenchmarkDotNet
-Next Phase: Phase 24 — Performance Optimization
+Current Task: Optimize critical path allocations and lock contention
+Next Phase: Phase 25 — Sample Application
 ```
 
 ---
@@ -129,7 +129,7 @@ Next Phase: Phase 24 — Performance Optimization
 | 20    | Unit Testing                     | Completed   |
 | 21    | Integration Testing              | Completed   |
 | 22    | Concurrency Testing              | Completed   |
-| 23    | Benchmarking                     | Not Started |
+| 23    | Benchmarking                     | Completed   |
 | 24    | Performance Optimization         | Not Started |
 | 25    | Sample Application               | Not Started |
 | 26    | API & Developer Experience       | Not Started |
@@ -140,28 +140,28 @@ Next Phase: Phase 24 — Performance Optimization
 
 # 5. Current Phase
 
-## Phase 22 — Concurrency Testing
+## Phase 23 — Benchmarking
 
 **Status:** Completed
 
 ### Objective
 
-Verify system safety, thread-pool stability, zero job loss, and absence of race conditions under heavy concurrent workload.
+Measure execution speed, queue throughput, and memory allocations using BenchmarkDotNet.
 
 ### Required Work
 
-- [x] Create `ConcurrencyTests.cs` in `ConcurrentJobEngine.IntegrationTests`
-- [x] Implement `PriorityJobScheduler.TryGetNextJob` and worker pool queue drain on graceful shutdown
-- [x] Test 1,000 parallel job submissions across 20 producer tasks and 8 worker threads
-- [x] Verify zero job loss and zero duplicate executions
-- [x] Test concurrent job cancellations under heavy parallel execution load
-- [x] Verify build and all test suites pass cleanly (83 total tests passing: 76 unit + 7 integration/concurrency)
+- [x] Add `BenchmarkDotNet` dependency to `ConcurrentJobEngine.Benchmarks.csproj`
+- [x] Create `SchedulerBenchmarks.cs` measuring enqueue/dequeue throughput and allocations
+- [x] Create `JobProcessorBenchmarks.cs` measuring `SubmitAsync` throughput and memory allocations
+- [x] Update `Program.cs` with `BenchmarkSwitcher` CLI runner
+- [x] Verify clean compilation of `ConcurrentJobEngine.Benchmarks` project
+- [x] Verify all unit and integration test suites pass without regression (83 total tests passing)
 
 ### Completion Criteria
 
-- [x] 1,000 jobs submitted across 20 parallel producers execute with zero job loss and zero duplicates.
-- [x] Concurrent cancellation during execution transitions all jobs safely to final states.
-- [x] Worker pool drains queued jobs on graceful shutdown.
+- [x] BenchmarkDotNet micro-benchmarking harness compiles cleanly in `ConcurrentJobEngine.Benchmarks`.
+- [x] Scheduler enqueue/dequeue and Processor submission benchmarks are established.
+- [x] All existing tests continue to pass.
 
 ---
 
@@ -169,7 +169,7 @@ Verify system safety, thread-pool stability, zero job loss, and absence of race 
 
 ```text
 Task:
-Implement performance micro-benchmarking suite using BenchmarkDotNet (Phase 23).
+Optimize critical path allocations and lock contention (Phase 24).
 
 Priority:
 High
@@ -185,14 +185,13 @@ Not Started
 The next implementation action is:
 
 ```text
-Benchmarking (Phase 23)
+Performance Optimization (Phase 24)
 ```
 
 Tasks to complete:
-1. Setup `ConcurrentJobEngine.Benchmarks` project with BenchmarkDotNet.
-2. Create throughput benchmarks (jobs/sec across varying worker counts).
-3. Create allocation/memory benchmarks.
-4. Create queue operation benchmarks (`PriorityJobScheduler` enqueue/dequeue throughput).
+1. Audit critical execution path for unnecessary heap allocations.
+2. Optimize `PriorityJobScheduler` synchronization and lock granularity.
+3. Verify test suite and benchmarks pass cleanly.
 
 ---
 
@@ -742,14 +741,14 @@ Task description
 An AI assistant joining the project should understand the following:
 
 ```text
-Phase 22 — Concurrency Testing has been completed.
+Phase 23 — Benchmarking has been completed.
 
-Implemented PriorityJobScheduler.TryGetNextJob and queue draining in WorkerPool. Added ConcurrencyTests.cs in ConcurrentJobEngine.IntegrationTests verifying 1,000 jobs submitted across 20 parallel producers executed with zero job loss and zero duplicate executions (83 total tests passing: 76 unit + 7 integration/concurrency).
+BenchmarkDotNet harness added to ConcurrentJobEngine.Benchmarks with SchedulerBenchmarks.cs, JobProcessorBenchmarks.cs, and BenchmarkSwitcher in Program.cs. Verified clean compilation and 83 passing tests across unit and integration suites.
 
-The next task is Phase 23:
-Benchmarking.
+The next task is Phase 24:
+Performance Optimization.
 
-Focus on establishing BenchmarkDotNet harness in ConcurrentJobEngine.Benchmarks.
+Focus on critical path allocation reduction and lock contention tuning.
 ```
 
 ---
@@ -831,13 +830,13 @@ Benchmarking:
 Dedicated Benchmark Project
 
 Current Phase:
-Phase 23 — Benchmarking
+Phase 24 — Performance Optimization
 
 Current Status:
-Phase 22 Completed / Phase 23 Not Started
+Phase 23 Completed / Phase 24 Not Started
 
 Immediate Next Step:
-Set up BenchmarkDotNet in Benchmarks project and add throughput/allocation benchmarks
+Audit and optimize hot path memory allocations and synchronization
 ```
 
 ---
