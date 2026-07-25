@@ -3,13 +3,25 @@ using System;
 namespace ConcurrentJobEngine.Core.Exceptions;
 
 /// <summary>
-/// Exception thrown when a job is rejected by the engine (e.g. queue capacity limits).
+/// Exception thrown when a job is rejected by the engine (e.g. queue capacity limits or shutdown).
 /// </summary>
 public class JobRejectedException : Exception
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JobRejectedException"/> class.
+    /// </summary>
     public JobRejectedException() { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JobRejectedException"/> class with a specified error message.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
     public JobRejectedException(string message) : base(message) { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JobRejectedException"/> class with a specified error message and inner exception.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception.</param>
     public JobRejectedException(string message, Exception innerException) : base(message, innerException) { }
 }
