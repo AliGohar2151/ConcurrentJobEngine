@@ -3,12 +3,12 @@ name: Publish to NuGet
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -36,11 +36,17 @@ jobs:
       - name: Run Tests
         run: dotnet test -c Release --no-build
 
-      - name: Pack Core Library
-        run: dotnet pack src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj -c Release -o nupkgs
+      - name: Pack ConcurrentJobEngine.Core
+        run: dotnet pack src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj -c Release --no-build -o nupkgs
 
-      - name: Pack Engine Library
-        run: dotnet pack src/ConcurrentJobEngine/ConcurrentJobEngine.csproj -c Release -o nupkgs
+      - name: Pack ConcurrentJobEngine
+        run: dotnet pack src/ConcurrentJobEngine/ConcurrentJobEngine.csproj -c Release --no-build -o nupkgs
 
-      - name: Push to NuGet
-        run: dotnet nuget push "nupkgs/*.nupkg" -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Show packages
+        run: ls -la nupkgs
+
+      - name: Publish packages to NuGet
+        run: |
+          dotnet nuget push "nupkgs/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
