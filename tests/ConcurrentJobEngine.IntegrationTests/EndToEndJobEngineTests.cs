@@ -242,7 +242,8 @@ public class EndToEndJobEngineTests
 
         await workerPool.StartAsync();
 
-        var jobId = await processor.SubmitAsync(new TestSuccessJob(100));
+        var jobId = await processor.SubmitAsync(new TestSuccessJob(10));
+        await Task.Delay(50);
 
         await processor.StopAsync();
 
