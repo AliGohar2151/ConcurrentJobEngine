@@ -36,8 +36,11 @@ jobs:
       - name: Run Tests
         run: dotnet test -c Release --no-build
 
-      - name: Pack Packages
-        run: dotnet pack -c Release -o nupkgs
+      - name: Pack Core Library
+        run: dotnet pack src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj -c Release -o nupkgs
+
+      - name: Pack Engine Library
+        run: dotnet pack src/ConcurrentJobEngine/ConcurrentJobEngine.csproj -c Release -o nupkgs
 
       - name: Push to NuGet
         run: dotnet nuget push "nupkgs/*.nupkg" -s https://api.nuget.org/v3/index.json --skip-duplicate

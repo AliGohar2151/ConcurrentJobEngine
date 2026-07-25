@@ -3,7 +3,7 @@
 [![build](https://github.com/AliGohar2151/ConcurrentJobEngine/actions/workflows/ci.yml/badge.svg)](https://github.com/AliGohar2151/ConcurrentJobEngine/actions)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
-[![NuGet](https://img.shields.io/badge/nuget-v1.0.2-blue.svg)](https://www.nuget.org/)
+[![NuGet](https://img.shields.io/badge/nuget-v1.0.3-blue.svg)](https://www.nuget.org/)
 
 **ConcurrentJobEngine** is a production-ready, high-performance, in-process concurrent job processing framework built for modern C# and .NET applications.
 
