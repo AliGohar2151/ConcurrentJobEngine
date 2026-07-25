@@ -8,8 +8,6 @@ namespace ConcurrentJobEngine.Execution;
 /// </summary>
 internal static class BackoffCalculator
 {
-    private static readonly Random _random = new();
-
     /// <summary>
     /// Computes the delay to wait before the next retry attempt.
     /// </summary>
@@ -42,7 +40,7 @@ internal static class BackoffCalculator
         }
 
         // Apply full jitter: random value in [0, delay]
-        var jitteredSeconds = _random.NextDouble() * delay.TotalSeconds;
+        var jitteredSeconds = Random.Shared.NextDouble() * delay.TotalSeconds;
         return TimeSpan.FromSeconds(jitteredSeconds);
     }
 }

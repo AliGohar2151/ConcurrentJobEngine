@@ -41,6 +41,8 @@ internal readonly struct PriorityKey : IComparable<PriorityKey>
 /// </summary>
 internal sealed class PriorityComparer : IComparer<PriorityKey>
 {
+    public static PriorityComparer Instance { get; } = new();
+
     public int Compare(PriorityKey x, PriorityKey y)
     {
         return x.CompareTo(y);
@@ -52,7 +54,7 @@ internal sealed class PriorityComparer : IComparer<PriorityKey>
 /// </summary>
 public sealed class PriorityJobScheduler : IJobScheduler
 {
-    private readonly PriorityQueue<Job, PriorityKey> _queue = new(new PriorityComparer());
+    private readonly PriorityQueue<Job, PriorityKey> _queue = new(PriorityComparer.Instance);
     private readonly SemaphoreSlim _semaphore = new(0);
     private readonly object _lock = new();
     private readonly IEngineMetrics? _metrics;

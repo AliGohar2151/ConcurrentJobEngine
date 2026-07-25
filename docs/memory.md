@@ -94,11 +94,11 @@ When conflicts occur:
 # 3. Current Project Status
 
 ```text
-Overall Status: Phase 23 Complete
-Current Phase: Phase 24 — Performance Optimization
+Overall Status: Phase 24 Complete
+Current Phase: Phase 25 — Sample Application
 Phase Status: Not Started
-Current Task: Optimize critical path allocations and lock contention
-Next Phase: Phase 25 — Sample Application
+Current Task: Create complete runnable sample application demonstrating ConcurrentJobEngine features
+Next Phase: Phase 26 — API & Developer Experience
 ```
 
 ---
@@ -130,7 +130,7 @@ Next Phase: Phase 25 — Sample Application
 | 21    | Integration Testing              | Completed   |
 | 22    | Concurrency Testing              | Completed   |
 | 23    | Benchmarking                     | Completed   |
-| 24    | Performance Optimization         | Not Started |
+| 24    | Performance Optimization         | Completed   |
 | 25    | Sample Application               | Not Started |
 | 26    | API & Developer Experience       | Not Started |
 | 27    | Packaging & Documentation        | Not Started |
@@ -140,28 +140,25 @@ Next Phase: Phase 25 — Sample Application
 
 # 5. Current Phase
 
-## Phase 23 — Benchmarking
+## Phase 24 — Performance Optimization
 
 **Status:** Completed
 
 ### Objective
 
-Measure execution speed, queue throughput, and memory allocations using BenchmarkDotNet.
+Reduce memory allocations and lock contention on critical hot paths.
 
 ### Required Work
 
-- [x] Add `BenchmarkDotNet` dependency to `ConcurrentJobEngine.Benchmarks.csproj`
-- [x] Create `SchedulerBenchmarks.cs` measuring enqueue/dequeue throughput and allocations
-- [x] Create `JobProcessorBenchmarks.cs` measuring `SubmitAsync` throughput and memory allocations
-- [x] Update `Program.cs` with `BenchmarkSwitcher` CLI runner
-- [x] Verify clean compilation of `ConcurrentJobEngine.Benchmarks` project
-- [x] Verify all unit and integration test suites pass without regression (83 total tests passing)
+- [x] Optimize `BackoffCalculator.cs` by replacing static `Random` with thread-safe `Random.Shared`
+- [x] Make `PriorityComparer` a static singleton (`PriorityComparer.Instance`) in `PriorityJobScheduler.cs`
+- [x] Verify build, unit test suite (76 tests), and integration test suite (7 tests) pass cleanly
 
 ### Completion Criteria
 
-- [x] BenchmarkDotNet micro-benchmarking harness compiles cleanly in `ConcurrentJobEngine.Benchmarks`.
-- [x] Scheduler enqueue/dequeue and Processor submission benchmarks are established.
-- [x] All existing tests continue to pass.
+- [x] Critical path allocation for priority sorting is zero.
+- [x] Random jitter in backoff calculation is lock-free and thread-safe.
+- [x] All 83 tests continue to pass.
 
 ---
 
@@ -169,7 +166,7 @@ Measure execution speed, queue throughput, and memory allocations using Benchmar
 
 ```text
 Task:
-Optimize critical path allocations and lock contention (Phase 24).
+Create complete runnable sample application demonstrating ConcurrentJobEngine features (Phase 25).
 
 Priority:
 High
@@ -185,13 +182,13 @@ Not Started
 The next implementation action is:
 
 ```text
-Performance Optimization (Phase 24)
+Sample Application (Phase 25)
 ```
 
 Tasks to complete:
-1. Audit critical execution path for unnecessary heap allocations.
-2. Optimize `PriorityJobScheduler` synchronization and lock granularity.
-3. Verify test suite and benchmarks pass cleanly.
+1. Build out `src/ConcurrentJobEngine.Sample` project.
+2. Implement realistic sample job handlers (e.g. EmailSendingJob, ReportGenerationJob, ImageProcessingJob).
+3. Showcase job submission, priority levels, retries, cancellation, metrics logging, and graceful shutdown.
 
 ---
 
@@ -741,14 +738,14 @@ Task description
 An AI assistant joining the project should understand the following:
 
 ```text
-Phase 23 — Benchmarking has been completed.
+Phase 24 — Performance Optimization has been completed.
 
-BenchmarkDotNet harness added to ConcurrentJobEngine.Benchmarks with SchedulerBenchmarks.cs, JobProcessorBenchmarks.cs, and BenchmarkSwitcher in Program.cs. Verified clean compilation and 83 passing tests across unit and integration suites.
+Optimized BackoffCalculator to use Random.Shared and PriorityJobScheduler to use static singleton PriorityComparer.Instance. Verified zero regression across all 83 tests (76 unit + 7 integration/concurrency).
 
-The next task is Phase 24:
-Performance Optimization.
+The next task is Phase 25:
+Sample Application.
 
-Focus on critical path allocation reduction and lock contention tuning.
+Focus on building out src/ConcurrentJobEngine.Sample with a complete interactive demonstration.
 ```
 
 ---
@@ -830,13 +827,13 @@ Benchmarking:
 Dedicated Benchmark Project
 
 Current Phase:
-Phase 24 — Performance Optimization
+Phase 25 — Sample Application
 
 Current Status:
-Phase 23 Completed / Phase 24 Not Started
+Phase 24 Completed / Phase 25 Not Started
 
 Immediate Next Step:
-Audit and optimize hot path memory allocations and synchronization
+Build runnable sample application in src/ConcurrentJobEngine.Sample
 ```
 
 ---
