@@ -76,9 +76,31 @@ In enterprise backend applications, processing background tasks (e.g., sending e
 
 ---
 
+## 📦 Installation
+
+Install `ConcurrentJobEngine` via the **.NET CLI**:
+
+```bash
+dotnet add package ConcurrentJobEngine
+```
+
+Or via **Package Manager Console** in Visual Studio:
+
+```powershell
+Install-Package ConcurrentJobEngine
+```
+
+Or add the `<PackageReference>` directly to your `.csproj` file:
+
+```xml
+<PackageReference Include="ConcurrentJobEngine" Version="1.0.0" />
+```
+
+---
+
 ## 💻 How Developers Use It
 
-### Step 1: Installation & Registration
+### Step 1: Service Registration
 
 Register `ConcurrentJobEngine` services in your application's Dependency Injection container:
 
