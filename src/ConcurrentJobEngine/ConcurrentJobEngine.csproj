@@ -11,12 +11,12 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>ConcurrentJobEngine</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Ali Gohar</Authors>
     <Company>Ali Gohar</Company>
     <Description>A high-performance in-process concurrent job processing engine for C# .NET supporting priority scheduling, exponential backoff retries with jitter, dead-letter store, metrics, and graceful shutdown.</Description>

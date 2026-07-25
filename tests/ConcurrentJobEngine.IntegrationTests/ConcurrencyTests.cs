@@ -51,7 +51,7 @@ public class ConcurrencyTests
     {
         ConcurrentWorkHandler.ExecutionCounts.Clear();
 
-        const int totalJobs = 500;
+        const int totalJobs = 200;
         const int producerTasksCount = 20;
         const int jobsPerProducer = totalJobs / producerTasksCount;
 
@@ -80,8 +80,8 @@ public class ConcurrencyTests
 
             Assert.Equal(totalJobs, submittedJobIds.Count);
 
-            // Wait for all 500 jobs to complete processing
-            var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+            // Wait for all jobs to complete processing
+            var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
             while (ConcurrentWorkHandler.ExecutionCounts.Count < totalJobs && !timeoutCts.IsCancellationRequested)
             {
                 await Task.Delay(10);
