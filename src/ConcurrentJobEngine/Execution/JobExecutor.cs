@@ -21,6 +21,7 @@ public sealed class JobExecutor : IJobExecutor
     private readonly IJobCancellationRegistry _cancellationRegistry;
     private readonly ConcurrentJobEngineOptions _options;
     private readonly ILogger<JobExecutor> _logger;
+    private readonly IEngineMetrics? _metrics;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JobExecutor"/> class.
@@ -32,7 +33,8 @@ public sealed class JobExecutor : IJobExecutor
         IServiceProvider serviceProvider,
         IJobCancellationRegistry cancellationRegistry,
         IOptions<ConcurrentJobEngineOptions> options,
-        ILogger<JobExecutor> logger)
+        ILogger<JobExecutor> logger,
+        IEngineMetrics? metrics = null)
     {
         _stateStore = stateStore ?? throw new ArgumentNullException(nameof(stateStore));
         _scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
@@ -41,6 +43,7 @@ public sealed class JobExecutor : IJobExecutor
         _cancellationRegistry = cancellationRegistry ?? throw new ArgumentNullException(nameof(cancellationRegistry));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _metrics = metrics;
     }
 
     /// <summary>
@@ -79,8 +82,10 @@ public sealed class JobExecutor : IJobExecutor
 
         try
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             var wrapper = JobHandlerResolver.GetWrapper(job.Payload.GetType());
             var result = await wrapper.HandleAsync(job.Payload, context, _serviceProvider, cts.Token);
+            sw.Stop();
 
             if (result.IsSuccess)
             {
@@ -88,6 +93,8 @@ public sealed class JobExecutor : IJobExecutor
                 job.CompletedAt = DateTimeOffset.UtcNow;
                 await _stateStore.AddOrUpdateAsync(job, CancellationToken.None);
                 _logger.LogInformation("Job {JobId} completed successfully.", job.Id);
+                _metrics?.RecordJobCompleted(sw.Elapsed.TotalSeconds);
+                _metrics?.DecrementActiveJobs();
                 return result;
             }
 
@@ -103,6 +110,7 @@ public sealed class JobExecutor : IJobExecutor
                 _logger.LogWarning("Job {JobId} failed on attempt {Attempt} with reason {Reason}. Retrying in {Delay} ms.", job.Id, job.AttemptCount, result.FailureReason, delay.TotalMilliseconds);
                 if (delay > TimeSpan.Zero) await Task.Delay(delay, CancellationToken.None);
 
+                _metrics?.RecordJobRetried();
                 job.Status = JobStatus.Queued;
                 await _stateStore.AddOrUpdateAsync(job, CancellationToken.None);
                 await _scheduler.ScheduleAsync(job, CancellationToken.None);
@@ -118,6 +126,10 @@ public sealed class JobExecutor : IJobExecutor
                     job.Id, job.Payload.GetType().Name, job.Payload,
                     result.FailureReason ?? FailureReason.ExecutionFailed, result.Message,
                     job.AttemptCount, job.StartedAt ?? DateTimeOffset.UtcNow, DateTimeOffset.UtcNow), CancellationToken.None);
+
+                _metrics?.RecordJobFailed();
+                _metrics?.RecordJobDeadLettered();
+                _metrics?.DecrementActiveJobs();
             }
 
             return result;
@@ -131,10 +143,15 @@ public sealed class JobExecutor : IJobExecutor
                 job.FailureReason = FailureReason.Cancelled;
                 await _stateStore.AddOrUpdateAsync(job, CancellationToken.None);
                 _logger.LogWarning("Job {JobId} was cancelled.", job.Id);
+
+                _metrics?.RecordJobCancelled();
+                _metrics?.DecrementActiveJobs();
+
                 return JobResult.Failure(FailureReason.Cancelled, "Job execution was cancelled.", ex);
             }
             else
             {
+                _metrics?.RecordJobTimedOut();
                 var retryOpts = job.RetryOptions ?? _options.DefaultRetryOptions;
                 if (job.AttemptCount < retryOpts.MaxAttempts)
                 {
@@ -147,6 +164,7 @@ public sealed class JobExecutor : IJobExecutor
                     _logger.LogWarning("Job {JobId} timed out on attempt {Attempt}. Retrying in {Delay} ms.", job.Id, job.AttemptCount, delay.TotalMilliseconds);
                     if (delay > TimeSpan.Zero) await Task.Delay(delay, CancellationToken.None);
 
+                    _metrics?.RecordJobRetried();
                     job.Status = JobStatus.Queued;
                     await _stateStore.AddOrUpdateAsync(job, CancellationToken.None);
                     await _scheduler.ScheduleAsync(job, CancellationToken.None);
@@ -162,6 +180,10 @@ public sealed class JobExecutor : IJobExecutor
                         job.Id, job.Payload.GetType().Name, job.Payload,
                         FailureReason.Timeout, $"Job exceeded timeout limit of {job.Timeout}.",
                         job.AttemptCount, job.StartedAt ?? DateTimeOffset.UtcNow, DateTimeOffset.UtcNow), CancellationToken.None);
+
+                    _metrics?.RecordJobFailed();
+                    _metrics?.RecordJobDeadLettered();
+                    _metrics?.DecrementActiveJobs();
                 }
                 return JobResult.Failure(FailureReason.Timeout, $"Job exceeded timeout limit of {job.Timeout}.", ex);
             }
@@ -180,6 +202,7 @@ public sealed class JobExecutor : IJobExecutor
                 _logger.LogWarning("Job {JobId} encountered exception on attempt {Attempt}. Retrying in {Delay} ms.", job.Id, job.AttemptCount, delay.TotalMilliseconds);
                 if (delay > TimeSpan.Zero) await Task.Delay(delay, CancellationToken.None);
 
+                _metrics?.RecordJobRetried();
                 job.Status = JobStatus.Queued;
                 await _stateStore.AddOrUpdateAsync(job, CancellationToken.None);
                 await _scheduler.ScheduleAsync(job, CancellationToken.None);
@@ -195,6 +218,10 @@ public sealed class JobExecutor : IJobExecutor
                     job.Id, job.Payload.GetType().Name, job.Payload,
                     FailureReason.ExecutionFailed, ex.Message,
                     job.AttemptCount, job.StartedAt ?? DateTimeOffset.UtcNow, DateTimeOffset.UtcNow), CancellationToken.None);
+
+                _metrics?.RecordJobFailed();
+                _metrics?.RecordJobDeadLettered();
+                _metrics?.DecrementActiveJobs();
             }
             return JobResult.Failure(FailureReason.ExecutionFailed, ex.Message, ex);
         }

@@ -23,6 +23,7 @@ public sealed class JobProcessor : IJobProcessor
     private readonly IJobCancellationRegistry _cancellationRegistry;
     private readonly ConcurrentJobEngineOptions _options;
     private readonly ILogger<JobProcessor> _logger;
+    private readonly IEngineMetrics? _metrics;
 
     private volatile bool _isShuttingDown;
 
@@ -36,7 +37,8 @@ public sealed class JobProcessor : IJobProcessor
         IWorkerPool workerPool,
         IJobCancellationRegistry cancellationRegistry,
         IOptions<ConcurrentJobEngineOptions> options,
-        ILogger<JobProcessor> logger)
+        ILogger<JobProcessor> logger,
+        IEngineMetrics? metrics = null)
     {
         _scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
         _stateStore = stateStore ?? throw new ArgumentNullException(nameof(stateStore));
@@ -45,6 +47,7 @@ public sealed class JobProcessor : IJobProcessor
         _cancellationRegistry = cancellationRegistry ?? throw new ArgumentNullException(nameof(cancellationRegistry));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _metrics = metrics;
     }
 
     /// <inheritdoc />
@@ -106,6 +109,9 @@ public sealed class JobProcessor : IJobProcessor
         jobWrapper.Status = JobStatus.Queued;
         await _stateStore.AddOrUpdateAsync(jobWrapper, cancellationToken);
 
+        _metrics?.RecordJobSubmitted();
+        _metrics?.IncrementActiveJobs();
+
         return jobId;
     }
 
@@ -164,6 +170,8 @@ public sealed class JobProcessor : IJobProcessor
             job.CompletedAt = DateTimeOffset.UtcNow;
             job.FailureReason = FailureReason.Cancelled;
             await _stateStore.AddOrUpdateAsync(job, cancellationToken);
+            _metrics?.RecordJobCancelled();
+            _metrics?.DecrementActiveJobs();
         }
     }
 

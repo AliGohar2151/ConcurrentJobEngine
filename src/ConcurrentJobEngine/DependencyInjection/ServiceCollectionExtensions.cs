@@ -1,6 +1,7 @@
 using System;
 using ConcurrentJobEngine.Core.Abstractions;
 using ConcurrentJobEngine.Core.Models;
+using ConcurrentJobEngine.Diagnostics;
 using ConcurrentJobEngine.Execution;
 using ConcurrentJobEngine.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,9 @@ public static class ServiceCollectionExtensions
 
         // Options
         services.Configure(configure);
+
+        // Diagnostics
+        services.TryAddSingleton<IEngineMetrics, EngineMetrics>();
 
         // Infrastructure — all singletons: shared queues, state, and registries
         services.TryAddSingleton<IJobStateStore, InMemoryJobStateStore>();

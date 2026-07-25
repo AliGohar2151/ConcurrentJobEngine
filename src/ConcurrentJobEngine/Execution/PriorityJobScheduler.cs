@@ -55,7 +55,17 @@ public sealed class PriorityJobScheduler : IJobScheduler
     private readonly PriorityQueue<Job, PriorityKey> _queue = new(new PriorityComparer());
     private readonly SemaphoreSlim _semaphore = new(0);
     private readonly object _lock = new();
+    private readonly IEngineMetrics? _metrics;
     private long _sequenceNumber;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PriorityJobScheduler"/> class.
+    /// </summary>
+    /// <param name="metrics">Optional engine metrics collector.</param>
+    public PriorityJobScheduler(IEngineMetrics? metrics = null)
+    {
+        _metrics = metrics;
+    }
 
     /// <inheritdoc />
     public Task ScheduleAsync(Job job, CancellationToken cancellationToken = default)
@@ -72,6 +82,7 @@ public sealed class PriorityJobScheduler : IJobScheduler
             _queue.Enqueue(job, key);
         }
 
+        _metrics?.IncrementQueueDepth();
         _semaphore.Release();
         return Task.CompletedTask;
     }
@@ -81,9 +92,16 @@ public sealed class PriorityJobScheduler : IJobScheduler
     {
         await _semaphore.WaitAsync(cancellationToken);
 
+        Job job;
         lock (_lock)
         {
-            return _queue.Dequeue();
+            job = _queue.Dequeue();
         }
+
+        _metrics?.DecrementQueueDepth();
+        double queueWaitTime = (DateTimeOffset.UtcNow - job.CreatedAt).TotalSeconds;
+        _metrics?.RecordJobDequeued(queueWaitTime);
+
+        return job;
     }
 }

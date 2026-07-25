@@ -94,11 +94,11 @@ When conflicts occur:
 # 3. Current Project Status
 
 ```text
-Overall Status: Phase 18 Complete
-Current Phase: Phase 19 — Metrics
+Overall Status: Phase 19 Complete
+Current Phase: Phase 20 — Unit Testing
 Phase Status: Not Started
-Current Task: Add runtime metrics tracking across job execution lifecycle and queue status
-Next Phase: Phase 20 — Unit Testing
+Current Task: Expand unit test coverage across all boundary conditions and edge cases
+Next Phase: Phase 21 — Integration Testing
 ```
 
 ---
@@ -125,7 +125,7 @@ Next Phase: Phase 20 — Unit Testing
 | 16    | Graceful Shutdown                | Completed   |
 | 17    | Dependency Injection             | Completed   |
 | 18    | Logging & Observability          | Completed   |
-| 19    | Metrics                          | Not Started |
+| 19    | Metrics                          | Completed   |
 | 20    | Unit Testing                     | Not Started |
 | 21    | Integration Testing              | Not Started |
 | 22    | Concurrency Testing              | Not Started |
@@ -140,25 +140,31 @@ Next Phase: Phase 20 — Unit Testing
 
 # 5. Current Phase
 
-## Phase 18 — Logging & Observability
+## Phase 19 — Metrics
 
 **Status:** Completed
 
 ### Objective
 
-Add structured operational logging across all engine execution steps and lifecycle events.
+Add runtime metrics tracking across job execution lifecycle and queue status using `System.Diagnostics.Metrics`.
 
 ### Required Work
 
-- [x] Audit structured log templates across JobProcessor, JobExecutor, WorkerPool, and Storage components
-- [x] Create `LoggingTests.cs` using an `ILoggerProvider` test sink to verify structured logging output
-- [x] Verify build and tests pass successfully
+- [x] Define `IEngineMetrics` interface in Core abstractions
+- [x] Create `EngineMetrics.cs` using `System.Diagnostics.Metrics.Meter` ("ConcurrentJobEngine") in Diagnostics
+- [x] Create `NullEngineMetrics.cs` no-op implementation
+- [x] Update `PriorityJobScheduler.cs` to inject `IEngineMetrics` and record queue depth (`queue.depth`) and wait time (`job.queue_duration`)
+- [x] Update `JobExecutor.cs` to inject `IEngineMetrics` and record execution metrics (`job.execution_duration`, `jobs.completed`, `jobs.failed`, `jobs.retried`, `jobs.cancelled`, `jobs.timed_out`, `jobs.dead_lettered`)
+- [x] Update `JobProcessor.cs` to inject `IEngineMetrics` and record submission metrics (`jobs.submitted`, `jobs.active`)
+- [x] Register `IEngineMetrics` in `ServiceCollectionExtensions.cs`
+- [x] Create `MetricsTests.cs` using `MeterListener` to verify metrics emission
+- [x] Verify build and tests pass cleanly
 
 ### Completion Criteria
 
-- [x] Important lifecycle events (submission, execution, completion, retry, timeout, cancellation, dead-letter, shutdown) are logged.
-- [x] Log messages include structured context (JobId, JobType, Reason, WorkerId, etc.).
-- [x] High-frequency loops do not produce excessive/unnecessary logs.
+- [x] All 11 recommended metric instruments are implemented and tested.
+- [x] `MeterListener` captures operational metric measurements.
+- [x] `NullEngineMetrics` provides no-op fallback when metrics are disabled.
 
 ---
 
@@ -166,7 +172,7 @@ Add structured operational logging across all engine execution steps and lifecyc
 
 ```text
 Task:
-Add runtime metrics tracking across job execution lifecycle and queue status (Phase 19).
+Expand unit test coverage across all boundary conditions and edge cases (Phase 20).
 
 Priority:
 High
@@ -182,14 +188,13 @@ Not Started
 The next implementation action is:
 
 ```text
-Implement Metrics (Phase 19)
+Comprehensive Unit Testing (Phase 20)
 ```
 
 Tasks to complete:
-1. Define metrics interfaces/counters or System.Diagnostics.Metrics Meter.
-2. Track job counters (submitted, completed, failed, retried, cancelled, timed out, dead-lettered).
-3. Track duration and active queue metrics.
-4. Unit test metrics collection.
+1. Audit unit test coverage across Core and Engine components.
+2. Add edge case tests (null parameters, extreme timeouts, high attempt counts, invalid state transitions).
+3. Ensure test suite is fast, deterministic, and isolated.
 
 ---
 
@@ -739,14 +744,14 @@ Task description
 An AI assistant joining the project should understand the following:
 
 ```text
-Phase 18 — Logging & Observability has been completed.
+Phase 19 — Metrics has been completed.
 
-Structured operational logging using ILogger<T> is in place across all engine components (JobProcessor, JobExecutor, WorkerPool). Verified via 2 unit tests in LoggingTests.cs using a custom TestLoggerProvider (66 total tests passing).
+IEngineMetrics abstraction created in Core abstractions. EngineMetrics implemented in src/ConcurrentJobEngine/Diagnostics/ using System.Diagnostics.Metrics.Meter ("ConcurrentJobEngine"). Metrics recorded across JobProcessor, JobExecutor, PriorityJobScheduler. Verified via 3 unit tests in MetricsTests.cs using MeterListener (69 total tests passing).
 
-The next task is Phase 19:
-Metrics.
+The next task is Phase 20:
+Unit Testing.
 
-Focus on runtime metrics tracking across job execution lifecycle and queue stats.
+Focus on expanding unit test coverage across edge cases and boundary conditions.
 ```
 
 ---
@@ -828,13 +833,13 @@ Benchmarking:
 Dedicated Benchmark Project
 
 Current Phase:
-Phase 19 — Metrics
+Phase 20 — Unit Testing
 
 Current Status:
-Phase 18 Completed / Phase 19 Not Started
+Phase 19 Completed / Phase 20 Not Started
 
 Immediate Next Step:
-Implement runtime metrics tracking in core engine
+Audit and expand unit test coverage across all boundary conditions
 ```
 
 ---
