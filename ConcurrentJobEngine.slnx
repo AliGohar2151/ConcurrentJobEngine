@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj" />
+    <Project Path="src/ConcurrentJobEngine.Sample/ConcurrentJobEngine.Sample.csproj" />
+    <Project Path="src/ConcurrentJobEngine/ConcurrentJobEngine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ConcurrentJobEngine.Benchmarks/ConcurrentJobEngine.Benchmarks.csproj" />
+    <Project Path="tests/ConcurrentJobEngine.IntegrationTests/ConcurrentJobEngine.IntegrationTests.csproj" />
+    <Project Path="tests/ConcurrentJobEngine.UnitTests/ConcurrentJobEngine.UnitTests.csproj" />
+  </Folder>
+</Solution>
