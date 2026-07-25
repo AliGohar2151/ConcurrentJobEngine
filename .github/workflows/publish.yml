@@ -1,5 +1,9 @@
 name: Publish to NuGet
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     tags:
@@ -7,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -26,24 +30,32 @@ jobs:
             9.0.x
             10.0.x
           include-prerelease: true
+          cache: true
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore ConcurrentJobEngine.slnx
 
       - name: Build Solution
-        run: dotnet build -c Release --no-restore
+        run: dotnet build ConcurrentJobEngine.slnx -c Release --no-restore
 
       - name: Run Tests
-        run: dotnet test -c Release --no-build
+        run: dotnet test ConcurrentJobEngine.slnx -c Release --no-build --verbosity normal
 
       - name: Pack ConcurrentJobEngine.Core
-        run: dotnet pack src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj -c Release --no-build -o nupkgs
+        run: dotnet pack src/ConcurrentJobEngine.Core/ConcurrentJobEngine.Core.csproj -c Release --no-build --no-restore -o nupkgs
 
       - name: Pack ConcurrentJobEngine
-        run: dotnet pack src/ConcurrentJobEngine/ConcurrentJobEngine.csproj -c Release --no-build -o nupkgs
+        run: dotnet pack src/ConcurrentJobEngine/ConcurrentJobEngine.csproj -c Release --no-build --no-restore -o nupkgs
 
       - name: Show packages
-        run: ls -la nupkgs
+        run: ls -lah nupkgs
+
+      - name: Verify package contents
+        run: |
+          for package in nupkgs/*.nupkg
+          do
+            echo "Found $package"
+          done
 
       - name: Login to NuGet (Trusted Publishing)
         id: login
@@ -57,3 +69,21 @@ jobs:
             --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: NuGet-Packages
+          path: nupkgs/*.nupkg
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: nupkgs/*.nupkg
+          generate_release_notes: true
+
+      - name: Publish Summary
+        run: |
+          echo "Published packages:"
+          ls nupkgs
