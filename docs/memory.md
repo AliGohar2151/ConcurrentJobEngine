@@ -94,11 +94,11 @@ When conflicts occur:
 # 3. Current Project Status
 
 ```text
-Overall Status: Phase 24 Complete
-Current Phase: Phase 25 — Sample Application
+Overall Status: Phase 25 Complete
+Current Phase: Phase 26 — API & Developer Experience
 Phase Status: Not Started
-Current Task: Create complete runnable sample application demonstrating ConcurrentJobEngine features
-Next Phase: Phase 26 — API & Developer Experience
+Current Task: Refine public API surface and fluent configuration builder
+Next Phase: Phase 27 — Packaging & Documentation
 ```
 
 ---
@@ -131,7 +131,7 @@ Next Phase: Phase 26 — API & Developer Experience
 | 22    | Concurrency Testing              | Completed   |
 | 23    | Benchmarking                     | Completed   |
 | 24    | Performance Optimization         | Completed   |
-| 25    | Sample Application               | Not Started |
+| 25    | Sample Application               | Completed   |
 | 26    | API & Developer Experience       | Not Started |
 | 27    | Packaging & Documentation        | Not Started |
 | 28    | Final Portfolio Release          | Not Started |
@@ -140,25 +140,25 @@ Next Phase: Phase 26 — API & Developer Experience
 
 # 5. Current Phase
 
-## Phase 24 — Performance Optimization
+## Phase 25 — Sample Application
 
 **Status:** Completed
 
 ### Objective
 
-Reduce memory allocations and lock contention on critical hot paths.
+Create a complete, runnable console sample application demonstrating ConcurrentJobEngine features.
 
 ### Required Work
 
-- [x] Optimize `BackoffCalculator.cs` by replacing static `Random` with thread-safe `Random.Shared`
-- [x] Make `PriorityComparer` a static singleton (`PriorityComparer.Instance`) in `PriorityJobScheduler.cs`
-- [x] Verify build, unit test suite (76 tests), and integration test suite (7 tests) pass cleanly
+- [x] Configure `ConcurrentJobEngine.Sample.csproj` dependencies
+- [x] Create `JobsAndHandlers.cs` defining `EmailNotificationJob`, `ImageProcessingJob`, `FlakyPaymentJob`, and `UnrecoverableJob` with corresponding handlers
+- [x] Implement interactive `Program.cs` demonstrating submission, priority scheduling, exponential backoff retries with jitter, dead-letter store routing, and graceful shutdown
+- [x] Verify clean execution of sample application
 
 ### Completion Criteria
 
-- [x] Critical path allocation for priority sorting is zero.
-- [x] Random jitter in backoff calculation is lock-free and thread-safe.
-- [x] All 83 tests continue to pass.
+- [x] `ConcurrentJobEngine.Sample` runs end-to-end without errors.
+- [x] Priority levels, retries, jitter backoff, dead-letter store, and graceful shutdown are demonstrated in live output.
 
 ---
 
@@ -166,7 +166,7 @@ Reduce memory allocations and lock contention on critical hot paths.
 
 ```text
 Task:
-Create complete runnable sample application demonstrating ConcurrentJobEngine features (Phase 25).
+Refine public API surface and fluent configuration builder (Phase 26).
 
 Priority:
 High
@@ -182,13 +182,13 @@ Not Started
 The next implementation action is:
 
 ```text
-Sample Application (Phase 25)
+API & Developer Experience (Phase 26)
 ```
 
 Tasks to complete:
-1. Build out `src/ConcurrentJobEngine.Sample` project.
-2. Implement realistic sample job handlers (e.g. EmailSendingJob, ReportGenerationJob, ImageProcessingJob).
-3. Showcase job submission, priority levels, retries, cancellation, metrics logging, and graceful shutdown.
+1. Review all public abstractions, methods, and options for naming consistency.
+2. Add XML documentation comments to any missing public symbols.
+3. Validate fluent builder API experience.
 
 ---
 
@@ -738,14 +738,14 @@ Task description
 An AI assistant joining the project should understand the following:
 
 ```text
-Phase 24 — Performance Optimization has been completed.
+Phase 25 — Sample Application has been completed.
 
-Optimized BackoffCalculator to use Random.Shared and PriorityJobScheduler to use static singleton PriorityComparer.Instance. Verified zero regression across all 83 tests (76 unit + 7 integration/concurrency).
+Built src/ConcurrentJobEngine.Sample with JobsAndHandlers.cs and Program.cs demonstrating priority levels, retries with jitter backoff, dead-letter routing, status queries, and graceful shutdown. Executed cleanly with 83 passing tests.
 
-The next task is Phase 25:
-Sample Application.
+The next task is Phase 26:
+API & Developer Experience.
 
-Focus on building out src/ConcurrentJobEngine.Sample with a complete interactive demonstration.
+Focus on XML documentation audit and fluent API refinement.
 ```
 
 ---
@@ -827,13 +827,13 @@ Benchmarking:
 Dedicated Benchmark Project
 
 Current Phase:
-Phase 25 — Sample Application
+Phase 26 — API & Developer Experience
 
 Current Status:
-Phase 24 Completed / Phase 25 Not Started
+Phase 25 Completed / Phase 26 Not Started
 
 Immediate Next Step:
-Build runnable sample application in src/ConcurrentJobEngine.Sample
+Audit XML docs and refine public developer API surface
 ```
 
 ---

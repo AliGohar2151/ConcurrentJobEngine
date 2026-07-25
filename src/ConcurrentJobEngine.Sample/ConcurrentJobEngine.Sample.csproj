@@ -1,7 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.10" />
     <ProjectReference Include="..\ConcurrentJobEngine\ConcurrentJobEngine.csproj" />
+    <ProjectReference Include="..\ConcurrentJobEngine.Core\ConcurrentJobEngine.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
