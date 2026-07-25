@@ -35,7 +35,7 @@ public class ConcurrencyTests
     private static IServiceProvider BuildConcurrencyServiceProvider(int workerCount)
     {
         var services = new ServiceCollection();
-        services.AddLogging(b => b.AddConsole());
+        services.AddLogging();
         services.AddConcurrentJobEngine(opts =>
         {
             opts.WorkerCount = workerCount;
@@ -82,9 +82,9 @@ public class ConcurrencyTests
 
             // Wait for all 1,000 jobs to complete processing
             var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            while (ConcurrentWorkHandler.ExecutionCounts.Count < totalJobs && !timeoutCts.Token.IsCancellationRequested)
+            while (ConcurrentWorkHandler.ExecutionCounts.Count < totalJobs && !timeoutCts.IsCancellationRequested)
             {
-                await Task.Delay(50, timeoutCts.Token);
+                await Task.Delay(10);
             }
 
             Assert.Equal(totalJobs, ConcurrentWorkHandler.ExecutionCounts.Count);

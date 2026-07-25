@@ -137,6 +137,18 @@ public sealed class WorkerPool : IWorkerPool
             }
             catch (OperationCanceledException) when (dequeueToken.IsCancellationRequested)
             {
+                // Dequeue token cancelled for shutdown: drain any remaining queued jobs before loop exit
+                while (_scheduler is PriorityJobScheduler priorityScheduler && priorityScheduler.TryGetNextJob(out var drainedJob) && drainedJob != null)
+                {
+                    try
+                    {
+                        await _executor.ExecuteAsync(drainedJob, _executeCts?.Token ?? CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Worker {WorkerId} encountered unhandled error executing drained job {JobId}.", workerId, drainedJob.Id);
+                    }
+                }
                 break;
             }
             catch (Exception ex)

@@ -104,4 +104,27 @@ public sealed class PriorityJobScheduler : IJobScheduler
 
         return job;
     }
+
+    /// <summary>
+    /// Attempts to dequeue the next job immediately without blocking. Used during queue draining.
+    /// </summary>
+    /// <param name="job">The dequeued job, if available.</param>
+    /// <returns><c>true</c> if a job was dequeued; otherwise, <c>false</c>.</returns>
+    public bool TryGetNextJob(out Job? job)
+    {
+        lock (_lock)
+        {
+            if (_queue.Count > 0 && _semaphore.Wait(0))
+            {
+                job = _queue.Dequeue();
+                _metrics?.DecrementQueueDepth();
+                double queueWaitTime = (DateTimeOffset.UtcNow - job.CreatedAt).TotalSeconds;
+                _metrics?.RecordJobDequeued(queueWaitTime);
+                return true;
+            }
+        }
+
+        job = null;
+        return false;
+    }
 }
