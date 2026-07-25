@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Internal documentation / Scratch docs
+docs/
+
 # dotenv files
 .env
 
